@@ -38,7 +38,6 @@ class MainHook : IXposedHookLoadPackage {
 
         Log.d(TAG, "inDrive загружен — автоматическая подмена селфи активирована")
 
-        // Загружаем лучшее фото один раз
         loadBestFakePhoto()
 
         if (fakeYPlane == null) {
@@ -48,7 +47,6 @@ class MainHook : IXposedHookLoadPackage {
 
         Log.d(TAG, "Фейковое фото загружено: \( {fakeWidth}x \){fakeHeight}, готов к подмене")
 
-        // Хук на ImageAnalysis.Analyzer.analyze(ImageProxy)
         try {
             val analyzerClass = XposedHelpers.findClass("androidx.camera.core.ImageAnalysis\$Analyzer", lpparam.classLoader)
             XposedHelpers.findAndHookMethod(
@@ -123,7 +121,6 @@ class MainHook : IXposedHookLoadPackage {
             fakeWidth = bitmap.width
             fakeHeight = bitmap.height
 
-            // Конвертируем в YUV_420_888 (NV21)
             val yuvBytes = bitmap.toNV21()
 
             val ySize = fakeWidth * fakeHeight
@@ -139,7 +136,6 @@ class MainHook : IXposedHookLoadPackage {
         }
     }
 
-    // Bitmap → NV21 (YUV_420_888)
     private fun Bitmap.toNV21(): ByteArray {
         val argb = IntArray(width * height)
         getPixels(argb, 0, width, 0, 0, width, height)
