@@ -117,7 +117,7 @@ class MainHook : IXposedHookLoadPackage {
                 return
             }
 
-            val bitmap = BitmapFactory.decodeFile(bestFile.absolutePath)!!
+            val bitmap = BitmapFactory.decodeFile(bestFile.absolutePath) ?: return
             fakeWidth = bitmap.width
             fakeHeight = bitmap.height
 
