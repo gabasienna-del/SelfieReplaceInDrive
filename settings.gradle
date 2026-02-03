@@ -1,0 +1,2 @@
+rootProject.name = 'SelfieReplaceInDrive'
+include ':app'
