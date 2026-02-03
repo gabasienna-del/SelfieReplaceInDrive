@@ -21,11 +21,8 @@ class MainHook : IXposedHookLoadPackage {
     companion object {
         private const val TAG = "SelfieReplace"
         private const val TARGET_PKG = "sinet.startup.inDriver"
-
-        // Папка с твоими фото (можно менять)
         private const val PHOTO_DIR = "/sdcard/"
 
-        // Кэш подменённого YUV (загружаем один раз)
         private var fakeYPlane: ByteBuffer? = null
         private var fakeUPlane: ByteBuffer? = null
         private var fakeVPlane: ByteBuffer? = null
@@ -61,7 +58,6 @@ class MainHook : IXposedHookLoadPackage {
                             val origWidth = imageProxy.width
                             val origHeight = imageProxy.height
 
-                            // Если размеры не совпадают — пропускаем
                             if (origWidth != fakeWidth || origHeight != fakeHeight) {
                                 Log.w(TAG, "Размеры не совпадают: fake $fakeWidth×$fakeHeight vs orig $origWidth×$origHeight")
                                 return
@@ -101,7 +97,6 @@ class MainHook : IXposedHookLoadPackage {
                 val height = bmp.height
                 val sizeKb = file.length() / 1024
 
-                // Оценка фото по критериям
                 val score = when {
                     width in 2844..3044 && height in 2108..2308 && sizeKb in 1700..1730 -> 100
                     width in 2800..3100 && height in 2100..2300 && sizeKb in 1600..1800 -> 70
@@ -154,11 +149,11 @@ class MainHook : IXposedHookLoadPackage {
                 val g = (pixel shr 8) and 0xff
                 val b = pixel and 0xff
 
-                yuv[yIndex++] = ((66 * r + 129 * g + 25 * b + 128) shr 8).toByte() + 16
+                yuv[yIndex++] = ((66 * r + 129 * g + 25 * b + 128) shr 8).toByte().plus(16)
 
                 if (j % 2 == 0 && i % 2 == 0) {
-                    yuv[uvIndex++] = ((-38 * r - 74 * g + 112 * b + 128) shr 8).toByte() + 128
-                    yuv[uvIndex++] = ((112 * r - 94 * g - 18 * b + 128) shr 8).toByte() + 128
+                    yuv[uvIndex++] = ((-38 * r - 74 * g + 112 * b + 128) shr 8).toByte().plus(128)
+                    yuv[uvIndex++] = ((112 * r - 94 * g - 18 * b + 128) shr 8).toByte().plus(128)
                 }
             }
         }
