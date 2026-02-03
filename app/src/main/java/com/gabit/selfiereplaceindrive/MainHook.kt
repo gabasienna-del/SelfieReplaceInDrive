@@ -45,7 +45,7 @@ class MainHook : IXposedHookLoadPackage {
             return
         }
 
-        Log.d(TAG, "Фейковое фото загружено: \( {fakeWidth}x \){fakeHeight}, готов к подмене")
+        Log.d(TAG, "Фейковое фото загружено: ${fakeWidth}x${fakeHeight}, готов к подмене")
 
         try {
             val analyzerClass = XposedHelpers.findClass("androidx.camera.core.ImageAnalysis\$Analyzer", lpparam.classLoader)
@@ -61,6 +61,7 @@ class MainHook : IXposedHookLoadPackage {
                             val origWidth = imageProxy.width
                             val origHeight = imageProxy.height
 
+                            // Если размеры не совпадают — пропускаем
                             if (origWidth != fakeWidth || origHeight != fakeHeight) {
                                 Log.w(TAG, "Размеры не совпадают: fake $fakeWidth×$fakeHeight vs orig $origWidth×$origHeight")
                                 return
@@ -100,6 +101,7 @@ class MainHook : IXposedHookLoadPackage {
                 val height = bmp.height
                 val sizeKb = file.length() / 1024
 
+                // Оценка фото по критериям
                 val score = when {
                     width in 2844..3044 && height in 2108..2308 && sizeKb in 1700..1730 -> 100
                     width in 2800..3100 && height in 2100..2300 && sizeKb in 1600..1800 -> 70
